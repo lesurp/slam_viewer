@@ -1,0 +1,9 @@
+[package]
+name = "viewer"
+version = "0.1.0"
+authors = ["Paul Lesur <paul.lesur@dfki.de>"]
+
+[dependencies]
+kiss3d = "0.16"
+nalgebra = "0.16"
+alga = "0.7.2"
