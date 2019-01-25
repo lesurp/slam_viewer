@@ -7,3 +7,6 @@ authors = ["Paul Lesur <paul.lesur@dfki.de>"]
 kiss3d = "0.16"
 nalgebra = "0.16"
 alga = "0.7.2"
+nom = "^4.1"
+log = "0.4"
+env_logger = "0.6.0"
