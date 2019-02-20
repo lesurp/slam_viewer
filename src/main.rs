@@ -17,8 +17,17 @@ use slam_viewer::SlamViewer;
 fn main() {
     env_logger::init();
 
+    let scale = if let Some(scale_str) = std::env::args().nth(1) {
+        scale_str.parse::<f32>().unwrap_or_else(|_| {
+            error!("Scale argument couldn't be parsed; defaulting to 1.0");
+            1.0
+        })
+    } else {
+        1.0
+    };
+
     let k = Matrix3::new(517.013, 0.0, 323.256, 0.0, 517.516, 251.825, 0.0, 0.0, 1.0);
-    let mut sv = SlamViewer::new("Super SLAM viewer", &k, 0.1);
+    let mut sv = SlamViewer::new("Super SLAM viewer", &k, scale);
     sv.draw_coordinate_system();
 
     let slam_data = Parser::parse_file("data").unwrap();
