@@ -1,5 +1,5 @@
 use nom::line_ending;
-use nom::float;
+use nom::{float, rest, re_capture};
 use nom::types::CompleteStr;
 use na::{Matrix3, Rotation, Vector3};
 use std::fs::File;
@@ -21,11 +21,13 @@ pub struct CameraWithPoints {
     pub r_cw: Rotation<f32, na::U3>,
     pub t_cw: Vector3<f32>,
     pub pixels: Vec<[f32; 2]>,
+    pub camera_id: Option<String>,
 }
 
 pub struct Parser {
     s: ParserState,
     sd: SlamData,
+    last_camera_id: Option<String>,
 }
 
 #[derive(Clone)]
@@ -69,10 +71,17 @@ impl Parser {
                (xp, yp)
                )));
 
+    named!(get_camera_id(nom::types::CompleteStr) ->(&str), 
+           do_parse!(
+               id: re_capture!("^.*CAMERA_ID\\s(.*)$") >>
+               (*id[1])
+               ));
+
     pub fn new() -> Parser {
         Parser {
             s: ParserState::PoseOrPoint,
-            sd: SlamData{ cameras: Vec::new(), points: Vec::new(), }
+            sd: SlamData{ cameras: Vec::new(), points: Vec::new(), },
+            last_camera_id: None,
         }
     }
 
@@ -89,6 +98,7 @@ impl Parser {
             r_cw: Rotation::from_matrix_unchecked(r),
             t_cw: t,
             pixels: Vec::new(),
+            camera_id: self.last_camera_id.clone(),
         });
     }
 
@@ -164,7 +174,31 @@ impl Parser {
         }
     }
 
+    fn try_camera_id(&mut self, l: &str) -> Result<Option<ParserState>, ParserError> {
+        debug!("try_camera_id");
+        if let ParserState::StartPose(_) = self.s {
+            return Ok(None);
+        }
+
+        let camera_id = Parser::get_camera_id(CompleteStr(l));
+        match (camera_id, &mut self.s) {
+            // errors...
+            (Err(_), _) => Ok(None),
+
+            (Ok((_, camera_id)), parser_state) => {
+                debug!("Camera id found: {}", camera_id);
+                self.last_camera_id = Some(camera_id.to_owned());
+                Ok(Some(parser_state.clone()))
+            }
+        }
+    }
+
     pub fn next_line(&mut self, l: String) -> Result<(), ParserError> {
+        if let Some(new_state) = self.try_camera_id(&l)? {
+            self.s = new_state;
+            return Ok(());
+        }
+
         if let Some(new_state) = self.try_four_floats(&l)? {
             self.s = new_state;
             return Ok(());
@@ -186,7 +220,7 @@ impl Parser {
         let file = File::open(file_path.into()).map_err(|_| ParserError::IoError)?;
         let mut parser = Parser::new();
         for line in BufReader::new(file).lines() {
-            debug!("parsing line:");
+            debug!("Parsing line:");
             debug!("{:?}", line);
             parser.next_line(line.map_err(|_| ParserError::IoError)?)?;
         }
