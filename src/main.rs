@@ -34,7 +34,6 @@ fn main() {
         (1.0, 1.0, 1.0),
     ];
     let mut colors_it = colors.iter().cycle();
-    let mut next_color = || *colors_it.next().unwrap();
 
     let k = Matrix3::new(517.013, 0.0, 323.256, 0.0, 517.516, 251.825, 0.0, 0.0, 1.0);
     let mut sv = SlamViewer::new("Super SLAM viewer", &k, scale);
@@ -43,7 +42,10 @@ fn main() {
     let slam_data = Parser::parse_file("data").unwrap();
     let mut color_map = std::collections::HashMap::new();
     for camera in slam_data.cameras {
-        let color = color_map.entry(camera.camera_id).or_insert(next_color());
+        debug!("Camera id: {:?}", camera.camera_id);
+        let color = color_map
+            .entry(camera.camera_id)
+            .or_insert_with(|| *colors_it.next().unwrap());
         debug!("Adding camera with color {:?}", color);
         let cam = sv.camera_from_p_cw(camera.r_cw, camera.t_cw, *color);
         for pixel in camera.pixels {
