@@ -1,5 +1,5 @@
 use nom::line_ending;
-use nom::{float, rest, re_capture};
+use nom::{float, re_capture};
 use nom::types::CompleteStr;
 use na::{Matrix3, Rotation, Vector3};
 use std::fs::File;
