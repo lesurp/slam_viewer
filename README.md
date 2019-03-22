@@ -18,10 +18,10 @@ We display the camera and the points exactly as described, and a ray from the ca
 
 # Settings
 
-You have to give:
+1. Intrinsics K (** FOR NOW HARDCODED WITHIN THE SOURCE :<**) [default = I<sub>3</sub>]
+2. The scale for the rendering (passed through argv[1] as a float) [default  = 1]
+3. The path to the data file (passed through argv[2]) [default = 'data']
 
-1. Intrinsics K
-2. The scale for the rendering
 
 There's another setting for the ray length that needs to be made public.
 
@@ -29,7 +29,7 @@ There's another setting for the ray length that needs to be made public.
 
 ## For all inputs
 
-1. Data is for read from an hardcoded file called `data` located in the current directory.
+1. Data is loaded by default from a file called `data` , or from argv[2] if it's defined
 2. Values should be floats
 3. Whitespace separated (\\t or spaces etc.)
 4. unless specified, any other character will invalidate the line (ie ignore it)
@@ -40,7 +40,7 @@ Note that 2 & 3 correspond to the default format output by Eigen when calling `c
 
 ### Camera poses
 
-1. Must be in the [ R\_wc | t\_wc ] form (3 * 4 matrix, )
+1. Must be in the [ R\_wc | t\_wc ] form (3 * 4 matrix) **NOT THE OPPOSITE**
 2. The three lines should be consecutive
 
 ### Points 3d
