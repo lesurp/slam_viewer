@@ -12,7 +12,8 @@ pub struct SlamData {
 
 #[derive(Debug)]
 pub enum ParserError {
-    IoError,
+    OpeningFile,
+    ReadingLine,
     IncompletePose,
     UnexpectedPixel,
 }
@@ -217,12 +218,12 @@ impl Parser {
     }
 
     pub fn parse_file<S: Into<String>>(file_path: S) -> Result<SlamData, ParserError> {
-        let file = File::open(file_path.into()).map_err(|_| ParserError::IoError)?;
+        let file = File::open(file_path.into()).map_err(|_| ParserError::OpeningFile)?;
         let mut parser = Parser::new();
         for line in BufReader::new(file).lines() {
             debug!("Parsing line:");
             debug!("{:?}", line);
-            parser.next_line(line.map_err(|_| ParserError::IoError)?)?;
+            parser.next_line(line.map_err(|_| ParserError::ReadingLine)?)?;
         }
         Ok(parser.sd)
     }
