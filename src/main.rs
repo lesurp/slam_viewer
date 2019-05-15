@@ -9,7 +9,6 @@ extern crate nom;
 
 mod parser;
 mod slam_viewer;
-use na::Matrix3;
 
 use parser::Parser;
 use slam_viewer::SlamViewer;
@@ -41,12 +40,11 @@ fn main() {
     ];
     let mut colors_it = colors.iter().cycle();
 
-    let k = Matrix3::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
     let window_title = String::from("Super SLAM viewer: ") + &data_file;
-    let mut sv = SlamViewer::new(&window_title, &k, scale);
-    sv.draw_coordinate_system();
 
     let slam_data = Parser::parse_file(data_file).unwrap();
+    let mut sv = SlamViewer::new(&window_title, &slam_data.k, scale);
+    sv.draw_coordinate_system();
     let mut color_map = std::collections::HashMap::new();
     for camera in slam_data.cameras {
         debug!("Camera id: {:?}", camera.camera_id);

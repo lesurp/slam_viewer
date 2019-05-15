@@ -96,7 +96,8 @@ impl SlamViewer {
         lens.set_local_translation(Translation3::from(t_wc));
         lens.prepend_to_local_translation(&forward_a_bit);
 
-        let up_a_bit = Translation3::from(r_wc.rotate_vector(&Vector3::new(0.0, 1.0 * self.scale, 0.0)));
+        let up_a_bit =
+            Translation3::from(r_wc.rotate_vector(&Vector3::new(0.0, 1.0 * self.scale, 0.0)));
         top.set_local_translation(Translation3::from(t_wc));
         top.prepend_to_local_translation(&up_a_bit);
         Camera { n, r_wc, t_wc }
