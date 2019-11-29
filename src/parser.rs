@@ -45,10 +45,16 @@ impl Parser {
     named!(get_four_floats(nom::types::CompleteStr) ->(f32, f32, f32, f32), 
            ws!(
                do_parse!(
+                   opt!(tag!("[")) >>
                    r1: float >>
+                   opt!(tag!(",")) >>
                    r2: float >>
+                   opt!(tag!(",")) >>
                    r3: float >>
+                   opt!(tag!(",")) >>
                    t: float >>
+                   opt!(tag!(";")) >>
+                   opt!(tag!("]")) >>
                    opt!(complete!(line_ending)) >>
                    (r1, r2, r3, t)
                    )));
@@ -56,9 +62,14 @@ impl Parser {
     named!(get_three_floats(nom::types::CompleteStr) ->(f32, f32, f32), 
            ws!(
            do_parse!(
+               opt!(tag!("[")) >>
                x: float >>
+               opt!(tag!(",")) >>
                y: float >>
+               opt!(tag!(",")) >>
                z: float >>
+               opt!(tag!(";")) >>
+               opt!(tag!("]")) >>
                opt!(complete!(line_ending)) >>
                (x, y, z)
                )));
@@ -69,6 +80,7 @@ impl Parser {
                opt!(tag!("[")) >>
                xp: float >>
                opt!(tag!(",")) >>
+               opt!(tag!(";")) >>
                yp: float >>
                opt!(tag!("]")) >>
                opt!(complete!(line_ending)) >>
